@@ -130,7 +130,8 @@
             "Ergonode\\Transformer\\": "module/transformer/src",
             "Ergonode\\TranslationDeepl\\": "module/translation-deepl/src",
             "Ergonode\\Value\\": "module/value/src",
-            "Ergonode\\Workflow\\": "module/workflow/src"
+            "Ergonode\\Workflow\\": "module/workflow/src",
+            "Kreft\\BooleanAttribute\\": "vendor2/boolean-attribute"
         }
     },
     "autoload-dev": {

@@ -1,0 +1,13 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+
+    Kreft\BooleanAttribute\:
+        resource: '../../*'
+
+
+    Kreft\BooleanAttribute\Command\Handler\:
+        resource: '../../Command/Handler/*'
+        tags: ['messenger.message_handler']
