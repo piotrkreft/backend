@@ -15,7 +15,6 @@ use Ergonode\EventSourcing\Infrastructure\Bus\CommandBusInterface;
 use Ergonode\Multimedia\Domain\Command\DeleteMultimediaCommand;
 use Ergonode\Multimedia\Domain\Entity\Multimedia;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Swagger\Annotations as SWG;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
@@ -68,15 +67,11 @@ class DeleteMultimediaAction
      *     response=409,
      *     description="Existing relationships"
      * )
-     *
-     *
-     *
-     * @ParamConverter(class="Ergonode\Multimedia\Domain\Entity\Multimedia")
      */
     public function __invoke(Multimedia $multimedia): Response
     {
         $relationships = $this->relationshipsResolver->resolve($multimedia->getId());
-        if (!$relationships->isEmpty()) {
+        if (null !== $relationships) {
             throw new ConflictHttpException($this->existingRelationshipMessageBuilder->build($relationships));
         }
 

@@ -20,17 +20,17 @@ use Ergonode\Account\Domain\Event\User\UserLanguagePrivilegesCollectionChangedEv
 use Ergonode\Account\Domain\Event\User\UserLastNameChangedEvent;
 use Ergonode\Account\Domain\Event\User\UserPasswordChangedEvent;
 use Ergonode\Account\Domain\Event\User\UserRoleChangedEvent;
-use Ergonode\Account\Domain\ValueObject\LanguagePrivileges;
+use Ergonode\Core\Domain\User\AggregateUserInterface;
 use Ergonode\Account\Domain\ValueObject\Password;
-use Ergonode\Authentication\Application\Security\User\UserInterface;
 use Ergonode\Core\Domain\ValueObject\Language;
+use Ergonode\Core\Domain\ValueObject\LanguagePrivileges;
 use Ergonode\EventSourcing\Domain\AbstractAggregateRoot;
 use Ergonode\SharedKernel\Domain\Aggregate\RoleId;
 use Ergonode\SharedKernel\Domain\Aggregate\UserId;
 use Ergonode\SharedKernel\Domain\ValueObject\Email;
 use JMS\Serializer\Annotation as JMS;
 
-class User extends AbstractAggregateRoot implements UserInterface
+class User extends AbstractAggregateRoot implements AggregateUserInterface
 {
     /**
      * @JMS\Type("Ergonode\SharedKernel\Domain\Aggregate\UserId")
@@ -70,7 +70,7 @@ class User extends AbstractAggregateRoot implements UserInterface
     /**
      * @var LanguagePrivileges[]
      *
-     * @JMS\Type("array<string, Ergonode\Account\Domain\ValueObject\LanguagePrivileges>")
+     * @JMS\Type("array<string, Ergonode\Core\Domain\ValueObject\LanguagePrivileges>")
      */
     private array $languagePrivilegesCollection;
 
@@ -172,7 +172,7 @@ class User extends AbstractAggregateRoot implements UserInterface
     public function changeFirstName(string $firstName): void
     {
         if ($this->firstName !== $firstName) {
-            $this->apply(new UserFirstNameChangedEvent($this->id, $this->firstName, $firstName));
+            $this->apply(new UserFirstNameChangedEvent($this->id, $firstName));
         }
     }
 
@@ -182,7 +182,7 @@ class User extends AbstractAggregateRoot implements UserInterface
     public function changeRole(RoleId $roleId): void
     {
         if (!$roleId->isEqual($this->roleId)) {
-            $this->apply(new UserRoleChangedEvent($this->id, $this->roleId, $roleId));
+            $this->apply(new UserRoleChangedEvent($this->id, $roleId));
         }
     }
 
@@ -209,7 +209,6 @@ class User extends AbstractAggregateRoot implements UserInterface
         $this->apply(
             new UserLanguagePrivilegesCollectionChangedEvent(
                 $this->id,
-                $this->languagePrivilegesCollection,
                 $languagePrivilegesCollection
             )
         );
@@ -221,7 +220,7 @@ class User extends AbstractAggregateRoot implements UserInterface
     public function changeLastName(string $lastName): void
     {
         if ($this->lastName !== $lastName) {
-            $this->apply(new UserLastNameChangedEvent($this->id, $this->lastName, $lastName));
+            $this->apply(new UserLastNameChangedEvent($this->id, $lastName));
         }
     }
 
@@ -231,7 +230,7 @@ class User extends AbstractAggregateRoot implements UserInterface
     public function changeLanguage(Language $language): void
     {
         if (!$language->isEqual($this->language)) {
-            $this->apply(new UserLanguageChangedEvent($this->id, $this->language, $language));
+            $this->apply(new UserLanguageChangedEvent($this->id, $language));
         }
     }
 

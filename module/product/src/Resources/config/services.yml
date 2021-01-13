@@ -15,6 +15,10 @@ services:
     Ergonode\Product\Infrastructure\:
         resource: '../../Infrastructure/*'
         exclude: '../../Infrastructure/{Message}'
+        
+    Ergonode\Product\Infrastructure\Persistence\:
+        resource: '../../Infrastructure/Persistence/*'
+        exclude: '../../Infrastructure/Persistence/{DataSet}'
 
     Ergonode\Product\Application\Controller\:
         resource: '../../Application/Controller'
@@ -31,6 +35,10 @@ services:
     Ergonode\Product\Infrastructure\JMS\Serializer\Handler\:
         resource: '../../Infrastructure/JMS/Serializer/Handler/*'
         tags: ['jms_serializer.subscribing_handler']
+
+    Ergonode\Product\Infrastructure\Processor\BatchAction\:
+        resource: '../../Infrastructure/Processor/BatchAction/*'
+        tags: ['batch_action.processor_provider.interface']
 
     Ergonode\Product\Domain\Repository\ProductRepositoryInterface: '@Ergonode\Product\Infrastructure\Persistence\Repository\DbalProductRepository'
     Ergonode\Product\Domain\Query\ProductQueryInterface: '@Ergonode\Product\Infrastructure\Persistence\Query\DbalProductQuery'

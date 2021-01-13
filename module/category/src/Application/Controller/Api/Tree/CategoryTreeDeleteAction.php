@@ -15,7 +15,6 @@ use Ergonode\Category\Domain\Entity\CategoryTree;
 use Ergonode\Core\Infrastructure\Builder\ExistingRelationshipMessageBuilderInterface;
 use Ergonode\Core\Infrastructure\Resolver\RelationshipsResolverInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Swagger\Annotations as SWG;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
@@ -79,13 +78,11 @@ class CategoryTreeDeleteAction
      *     response="409",
      *     description="Can't delete category tree"
      * )
-     *
-     * @ParamConverter(class="Ergonode\Category\Domain\Entity\CategoryTree")
      */
     public function __invoke(CategoryTree $tree): Response
     {
         $relationships = $this->relationshipsResolver->resolve($tree->getId());
-        if (!$relationships->isEmpty()) {
+        if (null !== $relationships) {
             throw new ConflictHttpException($this->existingRelationshipMessageBuilder->build($relationships));
         }
 

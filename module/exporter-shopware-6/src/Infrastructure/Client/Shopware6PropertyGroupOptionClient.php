@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Ergonode\ExporterShopware6\Infrastructure\Client;
 
 use Ergonode\Attribute\Domain\Entity\AbstractOption;
-use Ergonode\ExporterShopware6\Domain\Repository\Shopware6PropertyGroupOptionsRepositoryInterface;
+use Ergonode\ExporterShopware6\Domain\Repository\PropertyGroupOptionsRepositoryInterface;
 use Ergonode\ExporterShopware6\Infrastructure\Connector\Action\PropertyGroup\GetPropertyGroupOptions;
 use Ergonode\ExporterShopware6\Infrastructure\Connector\Action\PropertyGroup\PatchPropertyGroupOptionAction;
 use Ergonode\ExporterShopware6\Infrastructure\Connector\Action\PropertyGroup\PostPropertyGroupOptionsAction;
@@ -22,11 +22,11 @@ class Shopware6PropertyGroupOptionClient
 {
     private Shopware6Connector $connector;
 
-    private Shopware6PropertyGroupOptionsRepositoryInterface $propertyGroupOptionsRepository;
+    private PropertyGroupOptionsRepositoryInterface $propertyGroupOptionsRepository;
 
     public function __construct(
         Shopware6Connector $connector,
-        Shopware6PropertyGroupOptionsRepositoryInterface $propertyGroupOptionsRepository
+        PropertyGroupOptionsRepositoryInterface $propertyGroupOptionsRepository
     ) {
         $this->connector = $connector;
         $this->propertyGroupOptionsRepository = $propertyGroupOptionsRepository;
@@ -56,9 +56,17 @@ class Shopware6PropertyGroupOptionClient
         AbstractOption $option
     ): ?Shopware6PropertyGroupOption {
         $action = new PostPropertyGroupOptionsAction($propertyGroupId, $propertyGroupOption, true);
-
         $shopwarePropertyGroupOptions = $this->connector->execute($channel, $action);
 
+        if (!$shopwarePropertyGroupOptions instanceof Shopware6PropertyGroupOption) {
+            throw new \LogicException(
+                sprintf(
+                    'Expected an instance of %s. %s received.',
+                    Shopware6PropertyGroupOption::class,
+                    get_debug_type($shopwarePropertyGroupOptions)
+                )
+            );
+        }
         $this->propertyGroupOptionsRepository->save(
             $channel->getId(),
             $option->getAttributeId(),

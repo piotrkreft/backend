@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Ergonode\Segment\Domain\Event;
 
 use Ergonode\Core\Domain\ValueObject\TranslatableString;
-use Ergonode\EventSourcing\Domain\Event\AbstractTranslatableStringBasedChangedEvent;
+use Ergonode\Core\Domain\Event\AbstractTranslatableStringBasedChangedEvent;
 use Ergonode\SharedKernel\Domain\Aggregate\SegmentId;
 use JMS\Serializer\Annotation as JMS;
 
@@ -21,9 +21,9 @@ class SegmentNameChangedEvent extends AbstractTranslatableStringBasedChangedEven
      */
     private SegmentId $id;
 
-    public function __construct(SegmentId $id, TranslatableString $from, TranslatableString $to)
+    public function __construct(SegmentId $id, TranslatableString $to)
     {
-        parent::__construct($from, $to);
+        parent::__construct($to);
         $this->id = $id;
     }
 

@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Ergonode\Product\Domain\Entity;
 
 use Ergonode\Attribute\Domain\ValueObject\AttributeCode;
-use Ergonode\Editor\Domain\Entity\ProductDraft;
 use Ergonode\EventSourcing\Domain\AbstractAggregateRoot;
 use Ergonode\Product\Domain\Event\ProductAddedToCategoryEvent;
 use Ergonode\Product\Domain\Event\ProductCreatedEvent;
@@ -108,32 +107,9 @@ abstract class AbstractProduct extends AbstractAggregateRoot implements ProductI
     /**
      * @throws \Exception
      */
-    public function applyDraft(ProductDraft $draft): void
-    {
-        $attributes = $draft->getAttributes();
-        foreach ($attributes as $code => $value) {
-            $attributeCode = new AttributeCode((string) $code);
-            if ($this->hasAttribute($attributeCode)) {
-                $this->changeAttribute($attributeCode, $value);
-            } else {
-                $this->addAttribute($attributeCode, $value);
-            }
-        }
-
-        foreach (array_keys($this->getAttributes()) as $code) {
-            $attributeCode = new AttributeCode((string) $code);
-            if (!$draft->hasAttribute($attributeCode)) {
-                $this->removeAttribute($attributeCode);
-            }
-        }
-    }
-
-    /**
-     * @throws \Exception
-     */
     public function changeTemplate(TemplateId $templateId): void
     {
-        if (!$this->templateId->isEqual($this->templateId)) {
+        if (!$templateId->isEqual($this->templateId)) {
             $this->apply(new ProductTemplateChangedEvent($this->id, $templateId));
         }
     }
@@ -274,7 +250,6 @@ abstract class AbstractProduct extends AbstractAggregateRoot implements ProductI
                 new ProductValueChangedEvent(
                     $this->id,
                     $attributeCode,
-                    $this->attributes[$attributeCode->getValue()],
                     $value
                 )
             );
@@ -291,7 +266,7 @@ abstract class AbstractProduct extends AbstractAggregateRoot implements ProductI
         }
 
         $this->apply(
-            new ProductValueRemovedEvent($this->id, $attributeCode, $this->attributes[$attributeCode->getValue()])
+            new ProductValueRemovedEvent($this->id, $attributeCode)
         );
     }
 

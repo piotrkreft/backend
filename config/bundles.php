@@ -1,14 +1,18 @@
 <?php
+/**
+ * Copyright © Bold Brand Commerce Sp. z o.o. All rights reserved.
+ * See license.txt for license details.
+ */
 
 declare(strict_types=1);
 
 return [
     Doctrine\Bundle\DoctrineBundle\DoctrineBundle::class => ['all' => true],
-    Doctrine\Bundle\MigrationsBundle\DoctrineMigrationsBundle::class => ['all' => true],
     Ergonode\Account\ErgonodeAccountBundle::class => ['all' => true],
     Ergonode\Api\ErgonodeApiBundle::class => ['all' => true],
     Ergonode\Attribute\ErgonodeAttributeBundle::class => ['all' => true],
     Ergonode\Authentication\ErgonodeAuthenticationBundle::class => ['all' => true],
+    Ergonode\BatchAction\ErgonodeBatchActionBundle::class => ['all' => true],
     Ergonode\Category\ErgonodeCategoryBundle::class => ['all' => true],
     Ergonode\Channel\ErgonodeChannelBundle::class => ['all' => true],
     Ergonode\Comment\ErgonodeCommentBundle::class => ['all' => true],
@@ -16,7 +20,6 @@ return [
     Ergonode\Condition\ErgonodeConditionBundle::class => ['all' => true],
     Ergonode\Core\ErgonodeCoreBundle::class => ['all' => true],
     Ergonode\Designer\ErgonodeDesignerBundle::class => ['all' => true],
-    Ergonode\Editor\ErgonodeEditorBundle::class => ['all' => true],
     Ergonode\EventSourcing\ErgonodeEventSourcingBundle::class => ['all' => true],
     Ergonode\ExporterFile\ErgonodeExporterFileBundle::class => ['all' => true],
     Ergonode\ExporterMagento2\ErgonodeExporterMagento2Bundle::class => ['all' => true],
@@ -25,6 +28,7 @@ return [
     Ergonode\Fixture\ErgonodeFixtureBundle::class => ['dev' => true, 'test' => true],
     Ergonode\Generator\ErgonodeGeneratorBundle::class => ['dev' => true],
     Ergonode\Grid\ErgonodeGridBundle::class => ['all' => true],
+    Ergonode\ImporterErgonode1\ErgonodeImporterErgonode1Bundle::class => ['all' => true],
     Ergonode\ImporterMagento1\ErgonodeImporterMagento1Bundle::class => ['all' => true],
     Ergonode\Importer\ErgonodeImporterBundle::class => ['all' => true],
     Ergonode\Mailer\ErgonodeMailerBundle::class => ['all' => true],
@@ -36,7 +40,6 @@ return [
     Ergonode\Reader\ErgonodeReaderBundle::class => ['all' => true],
     Ergonode\Segment\ErgonodeSegmentBundle::class => ['all' => true],
     Ergonode\SharedKernel\ErgonodeSharedKernelBundle::class => ['all' => true],
-    Ergonode\Transformer\ErgonodeTransformerBundle::class => ['all' => true],
     Ergonode\TranslationDeepl\ErgonodeTranslationDeeplBundle::class => ['all' => true],
     Ergonode\Value\ErgonodeValueBundle::class => ['all' => true],
     Ergonode\Workflow\ErgonodeWorkflowBundle::class => ['all' => true],

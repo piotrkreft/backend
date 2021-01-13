@@ -46,23 +46,60 @@ class SegmentProductService
     /**
      * @throws DBALException
      */
-    public function mark(SegmentId $segmentId, ProductId $productId): void
+    public function addBySegment(SegmentId $segmentId): void
     {
-        $sql = 'INSERT INTO '.self::TABLE.' (segment_id, product_id, available, calculated_at)
-            VALUES (:segmentId, :productId, true, :calculatedAt)
-            ON CONFLICT ON CONSTRAINT segment_product_pkey
-                DO UPDATE SET available = true
+        $sql = 'INSERT INTO  '.self::TABLE.' (segment_id, product_id)
+                    SELECT :segmentId, p.id 
+                    FROM product p
+                ON CONFLICT ON CONSTRAINT segment_product_pkey
+                DO UPDATE SET calculated_at = NULL
         ';
         $this->connection->executeQuery(
             $sql,
             [
                 'segmentId' => $segmentId->getValue(),
+            ],
+        );
+    }
+
+    /**
+     * @throws DBALException
+     */
+    public function addByProduct(ProductId $productId): void
+    {
+        $sql = 'INSERT INTO  '.self::TABLE.' (segment_id, product_id)
+                    SELECT s.id, :productId
+                    FROM segment s
+                ON CONFLICT ON CONSTRAINT segment_product_pkey
+                DO UPDATE SET calculated_at = NULL
+        ';
+        $this->connection->executeQuery(
+            $sql,
+            [
                 'productId' => $productId->getValue(),
-                'calculatedAt' => new \DateTime(),
+            ],
+        );
+    }
+
+    /**
+     * @throws DBALException
+     */
+    public function mark(SegmentId $segmentId, ProductId $productId): void
+    {
+        $this->connection->update(
+            self::TABLE,
+            [
+                'available' => true,
+                'calculated_at' => new \DateTime(),
             ],
             [
-                'calculatedAt' => Types::DATETIMETZ_MUTABLE,
+                'segment_id' => $segmentId->getValue(),
+                'product_id' => $productId->getValue(),
             ],
+            [
+                'available' => \PDO::PARAM_BOOL,
+                'calculated_at' => Types::DATETIMETZ_MUTABLE,
+            ]
         );
     }
 

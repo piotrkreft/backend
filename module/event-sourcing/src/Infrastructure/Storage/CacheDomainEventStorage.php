@@ -12,7 +12,6 @@ use Ergonode\EventSourcing\Infrastructure\DomainEventStorageInterface;
 use Ergonode\EventSourcing\Infrastructure\Stream\DomainEventStream;
 use Ergonode\SharedKernel\Domain\AggregateId;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
-use Psr\Cache\InvalidArgumentException;
 
 class CacheDomainEventStorage implements DomainEventStorageInterface
 {
@@ -31,7 +30,7 @@ class CacheDomainEventStorage implements DomainEventStorageInterface
     /**
      * @return array
      *
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     public function load(AggregateId $id, int $sequence = 0, string $name = null): array
     {
@@ -57,13 +56,13 @@ class CacheDomainEventStorage implements DomainEventStorageInterface
         return $result;
     }
 
-    public function append(AggregateId $id, DomainEventStream $stream, string $name = null): void
+    public function append(AggregateId $id, DomainEventStream $stream, string $name = null): int
     {
-        $this->storage->append($id, $stream);
+        return $this->storage->append($id, $stream);
     }
 
     /**
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     public function delete(AggregateId $id, ?string $table = null, string $name = null): void
     {

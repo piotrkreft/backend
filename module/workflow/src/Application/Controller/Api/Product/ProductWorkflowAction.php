@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Ergonode\Workflow\Application\Controller\Api\Product;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Swagger\Annotations as SWG;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -18,6 +17,8 @@ use Ergonode\Product\Domain\Entity\AbstractProduct;
 use Ergonode\Core\Domain\ValueObject\Language;
 use Ergonode\Api\Application\Response\SuccessResponse;
 use Ergonode\Workflow\Infrastructure\Query\ProductWorkflowQuery;
+use Ergonode\Workflow\Domain\Provider\ProductStatusProvider;
+use Ergonode\Workflow\Domain\Provider\WorkflowProvider;
 
 /**
  * @Route(
@@ -31,9 +32,18 @@ class ProductWorkflowAction
 {
     private ProductWorkflowQuery $query;
 
-    public function __construct(ProductWorkflowQuery $query)
-    {
+    private ProductStatusProvider $statusProvider;
+
+    private WorkflowProvider $workflowProvider;
+
+    public function __construct(
+        ProductWorkflowQuery $query,
+        ProductStatusProvider $statusProvider,
+        WorkflowProvider $workflowProvider
+    ) {
         $this->query = $query;
+        $this->statusProvider = $statusProvider;
+        $this->workflowProvider = $workflowProvider;
     }
 
     /**
@@ -72,15 +82,14 @@ class ProductWorkflowAction
      *     description="Not found",
      * )
      *
-     *
-     * @ParamConverter(class="Ergonode\Product\Domain\Entity\AbstractProduct")
-     *
-     *
      * @throws \ReflectionException
+     * @throws \Exception
      */
-    public function __invoke(AbstractProduct $product, Language $language, string $productLanguage): Response
+    public function __invoke(AbstractProduct $product, Language $language, Language $productLanguage): Response
     {
-        $result = $this->query->getQuery($product, $language, new Language($productLanguage));
+        $workflow = $this->workflowProvider->provide();
+        $product = $this->statusProvider->getProduct($product, $workflow, $productLanguage);
+        $result = $this->query->getQuery($product, $workflow, $language, $productLanguage);
 
         return new SuccessResponse($result);
     }

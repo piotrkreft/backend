@@ -13,7 +13,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Ergonode\Core\Domain\ValueObject\Language;
 use Ergonode\Grid\DataSetInterface;
-use Ergonode\Grid\DbalDataSet;
+use Ergonode\Grid\Factory\DbalDataSetFactory;
 use Ergonode\Workflow\Domain\Provider\WorkflowProvider;
 use Ergonode\Workflow\Domain\Query\StatusQueryInterface;
 
@@ -25,12 +25,16 @@ class DbalStatusQuery implements StatusQueryInterface
 
     private WorkflowProvider $workflowProvider;
 
+    private DbalDataSetFactory $dataSetFactory;
+
     public function __construct(
         Connection $connection,
-        WorkflowProvider $workflowProvider
+        WorkflowProvider $workflowProvider,
+        DbalDataSetFactory $dataSetFactory
     ) {
         $this->connection = $connection;
         $this->workflowProvider = $workflowProvider;
+        $this->dataSetFactory = $dataSetFactory;
     }
 
     public function getDataSet(Language $language): DataSetInterface
@@ -45,7 +49,7 @@ class DbalStatusQuery implements StatusQueryInterface
         $result->select('*');
         $result->from(sprintf('(%s)', $query->getSQL()), 't');
 
-        return new DbalDataSet($result);
+        return $this->dataSetFactory->create($result);
     }
 
     /**
@@ -74,6 +78,7 @@ class DbalStatusQuery implements StatusQueryInterface
 
         $result = [];
         foreach ($records as $record) {
+            $result[$record['id']]['code'] = $record['code'];
             $result[$record['id']]['color'] = $record['color'];
             $result[$record['id']]['name'] = $record['name'];
         }

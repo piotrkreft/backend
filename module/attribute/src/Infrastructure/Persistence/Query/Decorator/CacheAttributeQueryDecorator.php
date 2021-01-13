@@ -141,10 +141,12 @@ class CacheAttributeQueryDecorator implements AttributeQueryInterface
     public function autocomplete(
         Language $language,
         string $search = null,
+        string $type = null,
         int $limit = null,
         string $field = null,
+        string $system = null,
         ?string $order = 'ASC'
     ): array {
-        return $this->attributeQuery->autocomplete($language, $search, $limit, $field, $order);
+        return $this->attributeQuery->autocomplete($language, $search, $type, $limit, $field, $system, $order);
     }
 }

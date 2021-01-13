@@ -223,6 +223,7 @@ class DbalAttributeQuery implements AttributeQueryInterface
         }
 
         return $qb
+            ->orderBy('code', 'ASC')
             ->execute()
             ->fetchAll(\PDO::FETCH_KEY_PAIR);
     }
@@ -303,8 +304,10 @@ class DbalAttributeQuery implements AttributeQueryInterface
     public function autocomplete(
         Language $language,
         string $search = null,
+        string $type = null,
         int $limit = null,
         string $field = null,
+        string $system = null,
         ?string $order = 'ASC'
     ): array {
         $query = $this->connection->createQueryBuilder()
@@ -320,8 +323,16 @@ class DbalAttributeQuery implements AttributeQueryInterface
             ->setParameter(':language', $language->getCode());
 
         if ($search) {
-            $query->orWhere('code ILIKE :search');
+            $query->andWhere('code ILIKE :search');
             $query->setParameter(':search', '%'.$search.'%');
+        }
+        if ($type) {
+            $query->andWhere('type=:type');
+            $query->setParameter(':type', $type);
+        }
+        if (null !== $system) {
+            $query->andWhere('a.system =:system');
+            $query->setParameter(':system', $system);
         }
         if ($field) {
             $query->orderBy($field, $order);

@@ -13,10 +13,10 @@ use Ergonode\Attribute\Domain\Repository\AttributeRepositoryInterface;
 use Ergonode\Core\Domain\ValueObject\Language;
 use Ergonode\Designer\Domain\ValueObject\TemplateElement\AttributeTemplateElementProperty;
 use Ergonode\Designer\Domain\ValueObject\TemplateElementPropertyInterface;
-use Ergonode\Editor\Domain\Entity\ProductDraft;
 use Ergonode\Product\Infrastructure\Calculator\TranslationInheritanceCalculator;
 use Webmozart\Assert\Assert;
 use Ergonode\Completeness\Domain\Calculator\CompletenessCalculatorLine;
+use Ergonode\Product\Domain\Entity\AbstractProduct;
 
 class AttributeTemplateElementCompletenessStrategy implements TemplateElementCompletenessStrategyInterface
 {
@@ -44,15 +44,22 @@ class AttributeTemplateElementCompletenessStrategy implements TemplateElementCom
      * {@inheritDoc}
      */
     public function getElementCompleteness(
-        ProductDraft $draft,
+        AbstractProduct $product,
         Language $language,
         TemplateElementPropertyInterface $properties
     ): ?CompletenessCalculatorLine {
-        Assert::isInstanceOf($properties, AttributeTemplateElementProperty::class);
-
+        if (!$properties instanceof AttributeTemplateElementProperty) {
+            throw new \LogicException(
+                sprintf(
+                    'Expected an instance of %s. %s received.',
+                    AttributeTemplateElementProperty::class,
+                    get_debug_type($properties)
+                )
+            );
+        }
         $attribute = $this->repository->load($properties->getAttributeId());
         Assert::notNull($attribute, sprintf('Can\'t find attribute %s', $properties->getAttributeId()->getValue()));
-        $value = $draft->hasAttribute($attribute->getCode()) ? $draft->getAttribute($attribute->getCode()) : null;
+        $value = $product->hasAttribute($attribute->getCode()) ? $product->getAttribute($attribute->getCode()) : null;
 
         $filled = false;
         if ($value) {

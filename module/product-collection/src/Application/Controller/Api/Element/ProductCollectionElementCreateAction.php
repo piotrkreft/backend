@@ -17,7 +17,6 @@ use Ergonode\ProductCollection\Application\Model\ProductCollectionElementCreateF
 use Ergonode\ProductCollection\Domain\Command\AddProductCollectionElementCommand;
 use Ergonode\ProductCollection\Domain\Entity\ProductCollection;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Swagger\Annotations as SWG;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,13 +24,14 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException;
 use Symfony\Component\Routing\Annotation\Route;
+use Ergonode\SharedKernel\Domain\Aggregate\ProductId;
 
 /**
  * @Route(
  *     name="ergonode_product_collection_element_create",
- *     path="/collections/{collection}/elements",
+ *     path="/collections/{productCollection}/elements",
  *     methods={"POST"},
- *     requirements={"collection"="[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"},
+ *     requirements={"productCollection"="[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"},
  * )
  */
 class ProductCollectionElementCreateAction
@@ -60,7 +60,7 @@ class ProductCollectionElementCreateAction
      *     default="en_GB"
      * )
      * @SWG\Parameter(
-     *     name="collection",
+     *     name="productCollection",
      *     in="path",
      *     type="string",
      *     required=true,
@@ -83,10 +83,6 @@ class ProductCollectionElementCreateAction
      *     @SWG\Schema(ref="#/definitions/validation_error_response")
      * )
      *
-     * @ParamConverter(class="Ergonode\ProductCollection\Domain\Entity\ProductCollection")
-     *
-     *
-     *
      * @throws \Exception
      */
     public function __invoke(ProductCollection $productCollection, Request $request): Response
@@ -102,7 +98,7 @@ class ProductCollectionElementCreateAction
 
                 $command = new AddProductCollectionElementCommand(
                     $productCollection->getId(),
-                    $data->productId,
+                    new ProductId($data->productId),
                     $data->visible,
                 );
 

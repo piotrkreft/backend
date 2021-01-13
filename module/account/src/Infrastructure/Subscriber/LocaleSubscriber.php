@@ -9,24 +9,22 @@ declare(strict_types=1);
 
 namespace Ergonode\Account\Infrastructure\Subscriber;
 
-use Ergonode\Account\Domain\Entity\User;
+use Ergonode\Account\Application\Security\Security;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\KernelEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\Security\Core\Security;
-use Symfony\Contracts\Translation\TranslatorInterface;
-use Webmozart\Assert\Assert;
+use Symfony\Contracts\Translation\LocaleAwareInterface;
 
 class LocaleSubscriber implements EventSubscriberInterface
 {
     private Security $security;
 
-    private TranslatorInterface $translator;
+    private LocaleAwareInterface $localeAware;
 
-    public function __construct(Security $security, TranslatorInterface $translator)
+    public function __construct(Security $security, LocaleAwareInterface $localeAware)
     {
         $this->security = $security;
-        $this->translator = $translator;
+        $this->localeAware = $localeAware;
     }
 
     /**
@@ -35,12 +33,10 @@ class LocaleSubscriber implements EventSubscriberInterface
     public function onKernelRequest(KernelEvent $event): void
     {
         $request = $event->getRequest();
-        if ($this->security->getUser()) {
-            /** @var User $user */
-            $user = $this->security->getUser();
-            Assert::notNull($user, 'Cannot find user %s');
+        $user = $this->security->getUser();
+        if ($user) {
             $locale = strtolower($user->getLanguage()->getCode());
-            $this->translator->setLocale($locale);
+            $this->localeAware->setLocale($locale);
             $request->setLocale($locale);
         }
     }

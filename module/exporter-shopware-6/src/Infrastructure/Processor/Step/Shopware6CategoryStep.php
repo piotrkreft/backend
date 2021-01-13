@@ -8,10 +8,11 @@ declare(strict_types=1);
 
 namespace Ergonode\ExporterShopware6\Infrastructure\Processor\Step;
 
+use Ergonode\Category\Domain\Entity\CategoryTree;
 use Ergonode\Category\Domain\Repository\TreeRepositoryInterface;
 use Ergonode\Category\Domain\ValueObject\Node;
 use Ergonode\EventSourcing\Infrastructure\Bus\CommandBusInterface;
-use Ergonode\ExporterShopware6\Domain\Command\Export\CategoryShopware6ExportCommand;
+use Ergonode\ExporterShopware6\Domain\Command\Export\CategoryExportCommand;
 use Ergonode\ExporterShopware6\Domain\Entity\Shopware6Channel;
 use Ergonode\ExporterShopware6\Infrastructure\Processor\Shopware6ExportStepProcessInterface;
 use Ergonode\SharedKernel\Domain\Aggregate\CategoryId;
@@ -34,9 +35,9 @@ class Shopware6CategoryStep implements Shopware6ExportStepProcessInterface
     {
         $categoryTreeId = $channel->getCategoryTree();
         if ($categoryTreeId) {
+            /** @var CategoryTree $tree */
             $tree = $this->treeRepository->load($categoryTreeId);
             Assert::notNull($tree, sprintf('Tree %s not exists', $categoryTreeId));
-            /** @var $tree CategoryTree */
             foreach ($tree->getCategories() as $node) {
                 $this->buildStep($exportId, $node);
             }
@@ -45,7 +46,7 @@ class Shopware6CategoryStep implements Shopware6ExportStepProcessInterface
 
     private function buildStep(ExportId $exportId, Node $node, CategoryId $parentId = null): void
     {
-        $processCommand = new CategoryShopware6ExportCommand($exportId, $node->getCategoryId(), $parentId);
+        $processCommand = new CategoryExportCommand($exportId, $node->getCategoryId(), $parentId);
         $this->commandBus->dispatch($processCommand, true);
 
         $newParent = $node->getCategoryId();

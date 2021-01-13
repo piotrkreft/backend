@@ -11,11 +11,12 @@ namespace Ergonode\Category\Infrastructure\Factory\Command;
 
 use Ergonode\Category\Application\Model\CategoryFormModel;
 use Ergonode\Category\Domain\Command\CreateCategoryCommand;
+use Ergonode\Category\Domain\Command\CreateCategoryCommandInterface;
 use Ergonode\Category\Domain\Entity\Category;
 use Ergonode\Core\Domain\ValueObject\TranslatableString;
-use Ergonode\EventSourcing\Infrastructure\DomainCommandInterface;
 use Ergonode\SharedKernel\Domain\Aggregate\CategoryId;
 use Symfony\Component\Form\FormInterface;
+use Ergonode\Category\Domain\ValueObject\CategoryCode;
 
 class CreateCategoryCommandFactory implements CreateCategoryCommandFactoryInterface
 {
@@ -27,14 +28,14 @@ class CreateCategoryCommandFactory implements CreateCategoryCommandFactoryInterf
     /**
      * @throws \Exception
      */
-    public function create(FormInterface $form): DomainCommandInterface
+    public function create(FormInterface $form): CreateCategoryCommandInterface
     {
         /** @var CategoryFormModel $data */
         $data = $form->getData();
 
         return new CreateCategoryCommand(
             CategoryId::generate(),
-            $data->code,
+            new CategoryCode($data->code),
             new TranslatableString($data->name)
         );
     }

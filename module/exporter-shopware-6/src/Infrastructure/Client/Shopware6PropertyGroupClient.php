@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Ergonode\ExporterShopware6\Infrastructure\Client;
 
 use Ergonode\Attribute\Domain\Entity\AbstractAttribute;
-use Ergonode\ExporterShopware6\Domain\Repository\Shopware6PropertyGroupRepositoryInterface;
+use Ergonode\ExporterShopware6\Domain\Repository\PropertyGroupRepositoryInterface;
 use Ergonode\ExporterShopware6\Infrastructure\Connector\Action\PropertyGroup\GetPropertyGroup;
 use Ergonode\ExporterShopware6\Infrastructure\Connector\Action\PropertyGroup\GetPropertyGroupList;
 use Ergonode\ExporterShopware6\Infrastructure\Connector\Action\PropertyGroup\PatchPropertyGroupAction;
@@ -24,9 +24,9 @@ class Shopware6PropertyGroupClient
 {
     private Shopware6Connector $connector;
 
-    private Shopware6PropertyGroupRepositoryInterface $repository;
+    private PropertyGroupRepositoryInterface $repository;
 
-    public function __construct(Shopware6Connector $connector, Shopware6PropertyGroupRepositoryInterface $repository)
+    public function __construct(Shopware6Connector $connector, PropertyGroupRepositoryInterface $repository)
     {
         $this->connector = $connector;
         $this->repository = $repository;
@@ -63,8 +63,17 @@ class Shopware6PropertyGroupClient
         AbstractAttribute $attribute
     ): ?Shopware6PropertyGroup {
         $action = new PostPropertyGroupAction($propertyGroup, true);
-
         $shopwarePropertyGroup = $this->connector->execute($channel, $action);
+
+        if (!$shopwarePropertyGroup instanceof Shopware6PropertyGroup) {
+            throw new \LogicException(
+                sprintf(
+                    'Expected an instance of %s. %s received.',
+                    Shopware6PropertyGroup::class,
+                    get_debug_type($shopwarePropertyGroup)
+                )
+            );
+        }
         $this->repository->save(
             $channel->getId(),
             $attribute->getId(),

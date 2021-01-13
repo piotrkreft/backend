@@ -138,20 +138,29 @@ Feature: Segment module
     Given I am Authenticated as "test@ergonode.com"
     And I add "Content-Type" header equal to "application/json"
     And I add "Accept" header equal to "application/json"
-    When I send a PUT request to "api/v1/en_GB/products/@product_id_1@/draft/@select_attribute_id@/value" with body:
+    When I send a PATCH request to "/api/v1/en_GB/products/attributes" with body:
       """
-      {
-        "value": "@select_val_1_id@"
+       {
+          "data": [
+          {
+            "id": "@product_id_1@",
+            "payload": [
+              {
+                "id": "@select_attribute_id@",
+                "values" : [
+                  {
+                    "language": "en_GB",
+                    "value": "@select_val_1_id@"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
       }
       """
     Then the response status code should be 200
 
-  Scenario: Apply product draft
-    Given I am Authenticated as "test@ergonode.com"
-    And I add "Content-Type" header equal to "application/json"
-    And I add "Accept" header equal to "application/json"
-    When I send a PUT request to "api/v1/en_GB/products/@product_id_1@/draft/persist"
-    Then the response status code should be 204
 
   Scenario: Create condition set
     Given I am Authenticated as "test@ergonode.com"
@@ -228,6 +237,18 @@ Feature: Segment module
           "pl_PL": "Opis segmentu",
           "en_GB": "Segment description"
         }
+      }
+      """
+    Then the response status code should be 400
+
+  Scenario: Create segment (too long code)
+    Given I am Authenticated as "test@ergonode.com"
+    And I add "Content-Type" header equal to "application/json"
+    And I add "Accept" header equal to "application/json"
+    When I send a POST request to "/api/v1/en_GB/segments" with body:
+      """
+      {
+        "code": "r6mph1idphxrfzmxfig8s4qkrjthwna3d5dhmd1zyhx2pgqind7uzm2z2o33unptminnrbtbel9a75xiqhxd2kusog1fi6g9t0tf1"
       }
       """
     Then the response status code should be 400
@@ -439,47 +460,31 @@ Feature: Segment module
     When I send a GET request to "/api/v1/en_GB/segments"
     Then the response status code should be 401
 
-  Scenario: Get segments (order by code)
+  Scenario Outline: Get segments (order by <field>)
     Given I am Authenticated as "test@ergonode.com"
     And I add "Content-Type" header equal to "application/json"
     And I add "Accept" header equal to "application/json"
-    When I send a GET request to "/api/v1/en_GB/segments?field=code"
-    Then the JSON should be valid according to the schema "grid/features/gridSchema.json"
+    When I send a GET request to "/api/v1/en_GB/segments?field=<field>"
+    Then the response status code should be 200
+    And the JSON should be valid according to the schema "grid/features/gridSchema.json"
+    Examples:
+      | field       |
+      | code        |
+      | name        |
+      | description |
 
-  Scenario: Get segments (order by name)
+  Scenario Outline: Get segments (filter by <field>)
     Given I am Authenticated as "test@ergonode.com"
     And I add "Content-Type" header equal to "application/json"
     And I add "Accept" header equal to "application/json"
-    When I send a GET request to "/api/v1/en_GB/segments?field=name"
-    Then the JSON should be valid according to the schema "grid/features/gridSchema.json"
-
-  Scenario: Get segments (order by description)
-    Given I am Authenticated as "test@ergonode.com"
-    And I add "Content-Type" header equal to "application/json"
-    And I add "Accept" header equal to "application/json"
-    When I send a GET request to "/api/v1/en_GB/segments?field=description"
-    Then the JSON should be valid according to the schema "grid/features/gridSchema.json"
-
-  Scenario: Get segments (filter by code)
-    Given I am Authenticated as "test@ergonode.com"
-    And I add "Content-Type" header equal to "application/json"
-    And I add "Accept" header equal to "application/json"
-    When I send a GET request to "/api/v1/en_GB/segments?limit=25&offset=0&filter=code%3Dsuper"
-    Then the JSON should be valid according to the schema "grid/features/gridSchema.json"
-
-  Scenario: Get segments (filter by name)
-    Given I am Authenticated as "test@ergonode.com"
-    And I add "Content-Type" header equal to "application/json"
-    And I add "Accept" header equal to "application/json"
-    When I send a GET request to "/api/v1/en_GB/segments?limit=25&offset=0&filter=name%3Dsuper"
-    Then the JSON should be valid according to the schema "grid/features/gridSchema.json"
-
-  Scenario: Get segments (filter by description)
-    Given I am Authenticated as "test@ergonode.com"
-    And I add "Content-Type" header equal to "application/json"
-    And I add "Accept" header equal to "application/json"
-    When I send a GET request to "/api/v1/en_GB/segments?limit=25&offset=0&filter=description%3Dsuper"
-    Then the JSON should be valid according to the schema "grid/features/gridSchema.json"
+    When I send a GET request to "/api/v1/en_GB/segments?limit=25&offset=0&filter=<field>>%3D<value>"
+    Then the response status code should be 200
+    And the JSON should be valid according to the schema "grid/features/gridSchema.json"
+    Examples:
+      | field       | value |
+      | code        | super |
+      | name        | super |
+      | description | super |
 
   Scenario: Get products based on segment (not authorized)
     When I send a GET request to "/api/v1/en_GB/segments/@segment_3@/products"

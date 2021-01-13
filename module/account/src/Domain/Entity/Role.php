@@ -18,7 +18,6 @@ use Ergonode\Account\Domain\Event\Role\RolePrivilegesChangedEvent;
 use Ergonode\Account\Domain\ValueObject\Privilege;
 use Ergonode\EventSourcing\Domain\AbstractAggregateRoot;
 use Ergonode\SharedKernel\Domain\Aggregate\RoleId;
-use Ergonode\SharedKernel\Domain\AggregateId;
 use JMS\Serializer\Annotation as JMS;
 use Webmozart\Assert\Assert;
 
@@ -68,9 +67,6 @@ class Role extends AbstractAggregateRoot
         $this->apply(new RoleCreatedEvent($id, $name, $description, $privileges, $hidden));
     }
 
-    /**
-     * @return RoleId|AggregateId
-     */
     public function getId(): RoleId
     {
         return $this->id;
@@ -102,7 +98,7 @@ class Role extends AbstractAggregateRoot
     public function changeName(string $name): void
     {
         if ($name !== $this->name) {
-            $this->apply(new RoleNameChangedEvent($this->id, $this->name, $name));
+            $this->apply(new RoleNameChangedEvent($this->id, $name));
         }
     }
 
@@ -113,13 +109,13 @@ class Role extends AbstractAggregateRoot
     {
         Assert::allIsInstanceOf($privileges, Privilege::class);
 
-        $this->apply(new RolePrivilegesChangedEvent($this->id, $this->privileges, $privileges));
+        $this->apply(new RolePrivilegesChangedEvent($this->id, $privileges));
     }
 
     public function changeDescription(?string $description): void
     {
         if ($description !== $this->description) {
-            $this->apply(new RoleDescriptionChangedEvent($this->id, $this->description, $description));
+            $this->apply(new RoleDescriptionChangedEvent($this->id, $description));
         }
     }
 

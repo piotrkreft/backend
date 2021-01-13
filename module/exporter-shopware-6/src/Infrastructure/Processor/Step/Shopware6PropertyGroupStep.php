@@ -9,7 +9,7 @@ declare(strict_types=1);
 namespace Ergonode\ExporterShopware6\Infrastructure\Processor\Step;
 
 use Ergonode\EventSourcing\Infrastructure\Bus\CommandBusInterface;
-use Ergonode\ExporterShopware6\Domain\Command\Export\PropertyGroupShopware6ExportCommand;
+use Ergonode\ExporterShopware6\Domain\Command\Export\PropertyGroupExportCommand;
 use Ergonode\ExporterShopware6\Domain\Entity\Shopware6Channel;
 use Ergonode\ExporterShopware6\Infrastructure\Processor\Shopware6ExportStepProcessInterface;
 use Ergonode\Product\Domain\Entity\VariableProduct;
@@ -19,7 +19,6 @@ use Ergonode\Segment\Domain\Query\SegmentProductsQueryInterface;
 use Ergonode\SharedKernel\Domain\Aggregate\AttributeId;
 use Ergonode\SharedKernel\Domain\Aggregate\ExportId;
 use Ergonode\SharedKernel\Domain\Aggregate\ProductId;
-use Webmozart\Assert\Assert;
 
 class Shopware6PropertyGroupStep implements Shopware6ExportStepProcessInterface
 {
@@ -48,7 +47,7 @@ class Shopware6PropertyGroupStep implements Shopware6ExportStepProcessInterface
         $attributeList = array_unique(array_merge($this->getBindingAttributes($channel), $channel->getPropertyGroup()));
 
         foreach ($attributeList as $attributeId) {
-            $processCommand = new PropertyGroupShopware6ExportCommand($exportId, $attributeId);
+            $processCommand = new PropertyGroupExportCommand($exportId, $attributeId);
             $this->commandBus->dispatch($processCommand, true);
         }
     }
@@ -63,7 +62,15 @@ class Shopware6PropertyGroupStep implements Shopware6ExportStepProcessInterface
         foreach ($products as $product) {
             $productId = new ProductId($product);
             $domainProduct = $this->productRepository->load($productId);
-            Assert::isInstanceOf($domainProduct, VariableProduct::class);
+            if (!$domainProduct instanceof  VariableProduct) {
+                throw new \LogicException(
+                    sprintf(
+                        'Expected an instance of %s. %s received.',
+                        VariableProduct::class,
+                        get_debug_type($domainProduct)
+                    )
+                );
+            }
             $bindings = $domainProduct->getBindings();
             $attribute = array_unique(array_merge($attribute, $bindings));
         }

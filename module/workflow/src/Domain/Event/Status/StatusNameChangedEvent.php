@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace Ergonode\Workflow\Domain\Event\Status;
 
 use Ergonode\Core\Domain\ValueObject\TranslatableString;
-use Ergonode\EventSourcing\Domain\Event\AbstractTranslatableStringBasedChangedEvent;
+use Ergonode\Core\Domain\Event\AbstractTranslatableStringBasedChangedEvent;
 use Ergonode\SharedKernel\Domain\Aggregate\StatusId;
 use JMS\Serializer\Annotation as JMS;
 
@@ -21,9 +21,9 @@ class StatusNameChangedEvent extends AbstractTranslatableStringBasedChangedEvent
      */
     private StatusId $id;
 
-    public function __construct(StatusId $id, TranslatableString $from, TranslatableString $to)
+    public function __construct(StatusId $id, TranslatableString $to)
     {
-        parent::__construct($from, $to);
+        parent::__construct($to);
         $this->id = $id;
     }
 

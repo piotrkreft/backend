@@ -17,7 +17,7 @@ use Ergonode\Core\Domain\Query\Builder\DefaultLabelQueryBuilderInterface;
 use Ergonode\Core\Domain\Query\LanguageQueryInterface;
 use Ergonode\Core\Domain\ValueObject\Language;
 use Ergonode\Grid\DataSetInterface;
-use Ergonode\Grid\DbalDataSet;
+use Ergonode\Grid\Factory\DbalDataSetFactory;
 use Ergonode\Product\Domain\Entity\AbstractAssociatedProduct;
 use Ergonode\Product\Domain\Entity\SimpleProduct;
 use Ergonode\Product\Domain\Entity\VariableProduct;
@@ -30,7 +30,6 @@ class DbalProductChildrenQuery implements ProductChildrenQueryInterface
     private const PRODUCT_TABLE = 'public.product';
     private const PRODUCT_CHILDREN_TABLE = 'public.product_children';
     private const PRODUCT_VALUE_TABLE = 'public.product_value';
-    private const TEMPLATE_TABLE = 'designer.template';
     private const VALUE_TRANSLATION_TABLE = 'public.value_translation';
     private const LANGUAGE_TREE_TABLE = 'public.language_tree';
 
@@ -44,18 +43,22 @@ class DbalProductChildrenQuery implements ProductChildrenQueryInterface
 
     protected DefaultImageQueryBuilderInterface $defaultImageQueryBuilder;
 
+    private DbalDataSetFactory $dataSetFactory;
+
     public function __construct(
         Connection $connection,
         LanguageQueryInterface $query,
         DefaultLabelQueryBuilderInterface $defaultLabelQueryBuilder,
         DefaultImageQueryBuilderInterface $defaultImageQueryBuilder,
-        ProductAttributeLanguageResolver $resolver
+        ProductAttributeLanguageResolver $resolver,
+        DbalDataSetFactory $dataSetFactory
     ) {
         $this->connection = $connection;
         $this->query = $query;
         $this->defaultLabelQueryBuilder = $defaultLabelQueryBuilder;
         $this->defaultImageQueryBuilder = $defaultImageQueryBuilder;
         $this->resolver = $resolver;
+        $this->dataSetFactory = $dataSetFactory;
     }
 
 
@@ -72,7 +75,7 @@ class DbalProductChildrenQuery implements ProductChildrenQueryInterface
         $result->select('*');
         $result->from(sprintf('(%s)', $qb->getSQL()), 't');
 
-        return new DbalDataSet($result);
+        return $this->dataSetFactory->create($result);
     }
 
     /**
@@ -88,12 +91,11 @@ class DbalProductChildrenQuery implements ProductChildrenQueryInterface
         $bindingValues = [];
 
         $qb = $this->connection->createQueryBuilder();
-        $qb->select('p.id, p.sku, dt.name as template')
+        $qb->select('p.id, p.sku, p.template_id')
             ->from(self::PRODUCT_TABLE, 'p')
             ->join('p', self::PRODUCT_VALUE_TABLE, 'pv', 'p.id = pv.product_id')
-            ->join('p', self::TEMPLATE_TABLE, 'dt', 'p.template_id = dt.id')
             ->where('p.type = :type')
-            ->groupBy('p.id, p.sku, dt.name')
+            ->groupBy('p.id, p.sku, p.template_id')
             ->having($qb->expr()->gt('count(*)', ':count'));
 
         if ($product instanceof VariableProduct) {
@@ -126,7 +128,7 @@ class DbalProductChildrenQuery implements ProductChildrenQueryInterface
         }
         $result->from(sprintf('(%s)', $qb->getSQL()), 't');
 
-        return new DbalDataSet($result);
+        return $this->dataSetFactory->create($result);
     }
 
 

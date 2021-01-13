@@ -13,15 +13,20 @@ use Ergonode\Api\Application\Response\SuccessResponse;
 use Ergonode\Core\Domain\ValueObject\Language;
 use Ergonode\Product\Domain\Entity\AbstractProduct;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Swagger\Annotations as SWG;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Ergonode\Completeness\Domain\Query\CompletenessQueryInterface;
+use Ergonode\Completeness\Domain\Calculator\CompletenessCalculator;
+use Ergonode\Designer\Domain\Repository\TemplateRepositoryInterface;
+use Webmozart\Assert\Assert;
+use Ergonode\Designer\Domain\Entity\Template;
+use Ergonode\Completeness\Domain\ReadModel\CompletenessElementReadModel;
+use Ergonode\Completeness\Domain\ReadModel\CompletenessReadModel;
 
 /**
  * @Route(
- *     "/products/{product}/draft/completeness",
+ *     "/products/{product}/completeness",
  *     methods={"GET"},
  *     requirements = {"product" = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"}
  * )
@@ -30,15 +35,24 @@ class CompletenessReadAction
 {
     private CompletenessQueryInterface $query;
 
-    public function __construct(CompletenessQueryInterface $query)
-    {
+    private CompletenessCalculator $calculator;
+
+    private TemplateRepositoryInterface $templateRepository;
+
+    public function __construct(
+        CompletenessQueryInterface $query,
+        CompletenessCalculator $calculator,
+        TemplateRepositoryInterface $templateRepository
+    ) {
         $this->query = $query;
+        $this->calculator = $calculator;
+        $this->templateRepository = $templateRepository;
     }
 
     /**
      * @IsGranted("PRODUCT_READ")
      *
-     * @SWG\Tag(name="Editor")
+     * @SWG\Tag(name="Product")
      * @SWG\Parameter(
      *     name="product",
      *     in="path",
@@ -55,18 +69,27 @@ class CompletenessReadAction
      * )
      * @SWG\Response(
      *     response=200,
-     *     description="Get draft grid",
+     *     description="Get product completenes information",
      * )
-     *
-     *
-     *
-     * @ParamConverter(class="Ergonode\Product\Domain\Entity\AbstractProduct")
      *
      * @throws \Exception
      */
     public function __invoke(AbstractProduct $product, Language $language): Response
     {
-        $result = $this->query->getCompleteness($product->getId(), $language);
+        $template = $this->templateRepository->load($product->getTemplateId());
+        Assert::isInstanceOf($template, Template::class);
+        $result = new CompletenessReadModel($language);
+        foreach ($this->calculator->calculate($product, $template, $language) as $element) {
+            $attributeId = $element->getAttributeId();
+            $element = new CompletenessElementReadModel(
+                $element->getAttributeId(),
+                $this->query->getAttributeLabel($attributeId, $language),
+                $element->isRequired(),
+                $element->isFilled(),
+            );
+
+            $result->addCompletenessElement($element);
+        }
 
         return new SuccessResponse($result);
     }

@@ -33,14 +33,28 @@ class ProductHasStatusConditionCalculatorStrategy implements ConditionCalculator
      */
     public function calculate(AbstractProduct $product, ConditionInterface $configuration): bool
     {
+        if (!$configuration instanceof ProductHasStatusCondition) {
+            throw new \LogicException(
+                sprintf(
+                    'Expected an instance of %s. %s received.',
+                    ProductHasStatusCondition::class,
+                    get_debug_type($configuration)
+                )
+            );
+        }
         $statusAttributeCode = new AttributeCode(StatusSystemAttribute::CODE);
 
         Assert::true($product->hasAttribute($statusAttributeCode));
-        $value = $product->getAttribute($statusAttributeCode)->getValue();
-        $productStatusId = StatusId::fromCode(reset($value));
+        $productStatuses = $product->getAttribute($statusAttributeCode)->getValue();
+
         $result = [];
-        foreach ($configuration->getValue() as $searchedStatusId) {
-            $result[] = $productStatusId->isEqual($searchedStatusId);
+        foreach ($configuration->getLanguage() as $language) {
+            if (array_key_exists($language->getCode(), $productStatuses)) {
+                $statusId = new StatusId($productStatuses[$language->getCode()]);
+                foreach ($configuration->getValue() as $searchedStatusId) {
+                    $result[] = $statusId->isEqual($searchedStatusId);
+                }
+            }
         }
         switch ($configuration->getOperator()) {
             case ProductHasStatusCondition::HAS:
