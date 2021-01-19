@@ -1,0 +1,19 @@
+framework:
+    messenger:
+        buses:
+            event.bus:
+                default_middleware: allow_no_handlers
+                middleware:
+                    - 'Ergonode\Core\Infrastructure\Messenger\Middleware\DbalTransactionMiddleware'
+            messenger.bus.sync:
+                default_middleware: false
+                middleware:
+                    - 'Ergonode\Core\Infrastructure\Messenger\Middleware\DbalTransactionMiddleware'
+                    - 'handle_message'
+            messenger.bus.async:
+                default_middleware: false
+                middleware:
+                    - 'send_message'
+                    - 'Ergonode\Core\Infrastructure\Messenger\Middleware\DbalTransactionMiddleware'
+                    - 'handle_message'
+        default_bus: messenger.bus.sync
