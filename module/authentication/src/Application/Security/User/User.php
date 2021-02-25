@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Ergonode\Authentication\Application\Security\User;
 
 use Ergonode\Core\Domain\User\UserInterface;
+use Ergonode\SharedKernel\Domain\Aggregate\UserId;
 
 class User implements UserInterface
 {
@@ -36,9 +37,9 @@ class User implements UserInterface
         $this->active = $active;
     }
 
-    public function getId(): string
+    public function getId(): UserId
     {
-        return $this->id;
+        return new UserId($this->id);
     }
 
     /**
