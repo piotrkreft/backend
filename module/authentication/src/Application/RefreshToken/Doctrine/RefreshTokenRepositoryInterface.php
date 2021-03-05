@@ -12,12 +12,8 @@ namespace Ergonode\Authentication\Application\RefreshToken\Doctrine;
 use Doctrine\Persistence\ObjectRepository;
 use Gesdinet\JWTRefreshTokenBundle\Entity\RefreshToken;
 
-interface RefreshTokenRepositoryInterface extends ObjectRepository
+interface RefreshTokenRepositoryInterface extends \Gesdinet\JWTRefreshTokenBundle\Doctrine\RefreshTokenRepositoryInterface
 {
     public function insert(RefreshToken $token): void;
     public function delete(RefreshToken $token): void;
-    /**
-     * @return RefreshToken[]
-     */
-    public function findInvalid(?\DateTimeInterface $dateTime = null): array;
 }

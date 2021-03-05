@@ -136,7 +136,7 @@ class DbalRefreshTokenRepository implements RefreshTokenRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function findInvalid(?\DateTimeInterface $dateTime = null): array
+    public function findInvalid($dateTime = null): array
     {
         if (null === $dateTime) {
             $dateTime = new \DateTime();
