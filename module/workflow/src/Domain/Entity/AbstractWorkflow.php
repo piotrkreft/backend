@@ -44,6 +44,11 @@ abstract class AbstractWorkflow extends AbstractAggregateRoot implements Workflo
 
     protected ?StatusId $defaultId;
 
+    public static function getMainType(): string
+    {
+        return 'workflow';
+    }
+
     /**
      * @param StatusId[] $statuses
      *
@@ -66,7 +71,15 @@ abstract class AbstractWorkflow extends AbstractAggregateRoot implements Workflo
         return $this->code;
     }
 
+    /**
+     * @deprecated method self::getType() is deprecated. Use getSubType instead
+     */
     abstract public static function getType(): string;
+
+    public function getSubType(): string
+    {
+        return $this->getType();
+    }
 
 
     public function hasStatus(StatusId $id): bool

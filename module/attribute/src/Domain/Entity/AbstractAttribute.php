@@ -49,6 +49,11 @@ abstract class AbstractAttribute extends AbstractAggregateRoot implements Attrib
      */
     protected array $parameters;
 
+    public static function getMainType(): string
+    {
+        return 'attribute';
+    }
+
     /**
      * @param array $parameters
      *
@@ -78,7 +83,15 @@ abstract class AbstractAttribute extends AbstractAggregateRoot implements Attrib
         );
     }
 
+    /**
+     * @deprecated method self::getType() is deprecated. Use getSubType instead
+     */
     abstract public function getType(): string;
+
+    public function getSubType(): string
+    {
+        return $this->getType();
+    }
 
     public function getId(): AttributeId
     {

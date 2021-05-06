@@ -35,6 +35,11 @@ class Role extends AbstractAggregateRoot
 
     private bool $hidden;
 
+    public static function getMainType(): string
+    {
+        return 'role';
+    }
+
     /**
      * @param array $privileges
      *

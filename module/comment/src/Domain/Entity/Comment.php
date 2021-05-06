@@ -30,6 +30,11 @@ class Comment extends AbstractAggregateRoot
 
     private string $content;
 
+    public static function getMainType(): string
+    {
+        return 'comment';
+    }
+
     /**
      * @throws \Exception
      */

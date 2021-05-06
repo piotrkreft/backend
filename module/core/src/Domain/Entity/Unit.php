@@ -23,6 +23,11 @@ class Unit extends AbstractAggregateRoot
 
     private string $symbol;
 
+    public static function getMainType(): string
+    {
+        return 'unit';
+    }
+
     /**
      * @throws \Exception
      */

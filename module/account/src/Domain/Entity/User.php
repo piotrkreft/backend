@@ -53,6 +53,11 @@ class User extends AbstractAggregateRoot implements UserInterface, LanguageColle
 
     private bool $isActive;
 
+    public static function getMainType(): string
+    {
+        return 'user';
+    }
+
     /**
      * @param LanguagePrivileges[] $languagePrivilegesCollection
      *

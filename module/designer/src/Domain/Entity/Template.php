@@ -51,6 +51,11 @@ class Template extends AbstractAggregateRoot
      */
     private array $elements;
 
+    public static function getMainType(): string
+    {
+        return 'template';
+    }
+
     public function __construct(
         TemplateId $id,
         TemplateGroupId $groupId,

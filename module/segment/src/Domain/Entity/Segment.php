@@ -32,6 +32,11 @@ class Segment extends AbstractAggregateRoot
 
     private ?ConditionSetId $conditionSetId;
 
+    public static function getMainType(): string
+    {
+        return 'segment';
+    }
+
     /**
      * @throws \Exception
      */

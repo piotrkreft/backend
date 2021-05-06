@@ -45,6 +45,11 @@ class ProductCollection extends AbstractAggregateRoot
 
     private ?\DateTime $editedAt = null;
 
+    public static function getMainType(): string
+    {
+        return 'product_collection';
+    }
+
     public function __construct(
         ProductCollectionId $id,
         ProductCollectionCode $code,

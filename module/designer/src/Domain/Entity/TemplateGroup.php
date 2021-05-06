@@ -19,6 +19,11 @@ class TemplateGroup extends AbstractAggregateRoot
 
     private string $name;
 
+    public static function getMainType(): string
+    {
+        return 'template_group';
+    }
+
     /**
      * @throws \Exception
      */

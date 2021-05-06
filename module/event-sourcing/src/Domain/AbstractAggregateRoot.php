@@ -26,6 +26,11 @@ abstract class AbstractAggregateRoot
 
     abstract public function getId(): AggregateId;
 
+    public static function getMainType(): string
+    {
+        return 'aggregate';
+    }
+
     /**
      * @throws \Exception
      */

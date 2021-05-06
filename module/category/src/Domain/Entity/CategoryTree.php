@@ -35,6 +35,11 @@ class CategoryTree extends AbstractAggregateRoot
      */
     private array $categories;
 
+    public static function getMainType(): string
+    {
+        return 'category_tree';
+    }
+
     /**
      * @throws \Exception
      */

@@ -27,6 +27,11 @@ abstract class AbstractOption extends AbstractAggregateRoot
 
     private TranslatableString $label;
 
+    public static function getMainType(): string
+    {
+        return 'option';
+    }
+
     /**
      * @throws \Exception
      */

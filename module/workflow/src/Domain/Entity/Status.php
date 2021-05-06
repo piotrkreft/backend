@@ -31,6 +31,11 @@ class Status extends AbstractAggregateRoot
 
     private TranslatableString $description;
 
+    public static function getMainType(): string
+    {
+        return 'status';
+    }
+
     /**
      * @throws \Exception
      */

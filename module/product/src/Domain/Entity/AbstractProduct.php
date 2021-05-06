@@ -43,6 +43,11 @@ abstract class AbstractProduct extends AbstractAggregateRoot implements ProductI
 
     protected TemplateId $templateId;
 
+    public static function getMainType(): string
+    {
+        return 'product';
+    }
+
     /**
      * @param CategoryId[] $categories
      * @param array        $attributes
@@ -61,7 +66,7 @@ abstract class AbstractProduct extends AbstractAggregateRoot implements ProductI
         $this->apply(new ProductCreatedEvent(
             $id,
             $sku,
-            $this->getType(),
+            $this->getSubType(),
             $templateId,
         ));
 
@@ -74,7 +79,15 @@ abstract class AbstractProduct extends AbstractAggregateRoot implements ProductI
         }
     }
 
+    /**
+     * @deprecated method self::getType() is deprecated. Use getSubType instead
+     */
     abstract public function getType(): string;
+
+    public function getSubType(): string
+    {
+        return $this->getType();
+    }
 
     public function getId(): ProductId
     {

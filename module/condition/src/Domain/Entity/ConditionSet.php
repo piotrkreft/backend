@@ -25,6 +25,11 @@ class ConditionSet extends AbstractAggregateRoot
      */
     private array $conditions;
 
+    public static function getMainType(): string
+    {
+        return 'condition_set';
+    }
+
     /**
      * @param ConditionInterface[] $conditions
      *

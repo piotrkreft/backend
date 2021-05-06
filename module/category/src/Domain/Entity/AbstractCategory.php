@@ -35,6 +35,11 @@ abstract class AbstractCategory extends AbstractAggregateRoot
      */
     private array $attributes;
 
+    public static function getMainType(): string
+    {
+        return 'category';
+    }
+
     /**
      * @param array $attributes
      *
@@ -53,7 +58,15 @@ abstract class AbstractCategory extends AbstractAggregateRoot
         ));
     }
 
+    /**
+     * @deprecated method self::getType() is deprecated. Use getSubType instead
+     */
     abstract public function getType(): string;
+
+    public function getSubType(): string
+    {
+        return $this->getType();
+    }
 
     public function getId(): CategoryId
     {

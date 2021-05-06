@@ -24,6 +24,11 @@ class AttributeGroup extends AbstractAggregateRoot
 
     private TranslatableString $name;
 
+    public static function getMainType(): string
+    {
+        return 'attribute_group';
+    }
+
     /**
      * @throws \Exception
      */

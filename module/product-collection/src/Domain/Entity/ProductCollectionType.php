@@ -24,6 +24,11 @@ class ProductCollectionType extends AbstractAggregateRoot
 
     private TranslatableString $name;
 
+    public static function getMainType(): string
+    {
+        return 'product_collection_type';
+    }
+
     public function __construct(ProductCollectionTypeId $id, ProductCollectionTypeCode $code, TranslatableString $name)
     {
         $this->apply(new ProductCollectionTypeCreatedEvent($id, $code, $name));

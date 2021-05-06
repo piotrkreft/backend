@@ -36,6 +36,11 @@ abstract class AbstractMultimedia extends AbstractAggregateRoot
 
     private TranslatableString $alt;
 
+    public static function getMainType(): string
+    {
+        return 'multimedia';
+    }
+
     /**
      * @param int $size The file size in bytes.
      *
