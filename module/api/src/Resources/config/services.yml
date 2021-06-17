@@ -10,10 +10,6 @@ services:
     Ergonode\Api\Infrastructure\:
         resource: '../../Infrastructure/*'
 
-    Ergonode\Api\Application\EventListener\RequestBodyListener:
-        tags:
-            - { name: 'kernel.event_listener', event: 'kernel.request', priority: 1024 }
-
     Ergonode\Api\Application\EventListener\ResponseFormatterListener:
         tags:
             - { name: 'kernel.event_listener', event: 'kernel.response', priority: 128 }
